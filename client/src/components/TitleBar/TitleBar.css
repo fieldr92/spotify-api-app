@@ -1,0 +1,29 @@
+.title-bar {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  background-color: #FFFFFF;
+  height: 100px;
+  line-height: 100px;
+  vertical-align: middle;
+  padding: 0 50px;
+}
+
+.title-logo {
+  width: 100px;
+}
+
+.title {
+  color: #1DB954;
+  margin: 0;
+}
+
+button {
+  font-family: proxima-nova, sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  border-radius: 5px;
+  background-color: #191414;
+  color: #1DB954;
+  padding: 10px;
+}

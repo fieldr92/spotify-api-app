@@ -1,0 +1,25 @@
+.playlist-container {
+  margin: 0;
+  text-align: center;
+  width: 100%;
+}
+
+.playlists-title {
+  margin: 0;
+}
+
+.playlist-item {
+  display: inline-block;
+  margin: 15px;
+}
+
+.playlist-name {
+  color: #1DB954;
+  font-size: 20px;
+  margin: 5px 0;
+}
+
+.playlist-image {
+  height: 200px;
+  width: 200px;
+}

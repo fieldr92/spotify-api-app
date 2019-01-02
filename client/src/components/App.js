@@ -1,5 +1,8 @@
 import React, { Component } from 'react';
-import Playlists from './Playlists';
+import TitleBar from './TitleBar/TitleBar';
+import LoginPage from './LoginPage/LoginPage';
+import Playlists from './Playlists/Playlists';
+import './App.css';
 
 class App extends Component {
   state = {
@@ -35,7 +38,6 @@ class App extends Component {
           })
         )});
       });
-
     }
   }
 
@@ -43,28 +45,33 @@ class App extends Component {
     this.setState({ userData: null });
   }
 
-  handleData() {
-    if (this.state.userData) {
+  handleData = ({ userData, playlists }) => {
+    if (userData) {
       return (
-        <Playlists
-          userData={this.state.userData}
-          playlists={this.state.playlists}
-          clearUserData={this.clearUserData}
-        />
+        <>
+          <TitleBar
+            clearUserData={this.clearUserData}
+          />
+          <h1 style={{ width: '100%', textAlign: 'center' }}>Welcome to your Spotify, {userData.name}!</h1>
+          <Playlists
+            userData={userData}
+            playlists={playlists}
+            clearUserData={this.clearUserData}
+          />
+        </>
       )
     } else {
       return (
-        <div>
-          <h1>Please login to access data...</h1>
-          <button onClick={() => window.location='http://localhost:8888/login'}>Login to Spotify!</button>
-        </div>
+        <>
+          <LoginPage />
+        </>
       );
     }
   }
 
   render() {
     return (
-      <>{this.handleData()}</>
+      <>{this.handleData(this.state)}</>
     );
   }
 }

@@ -2,77 +2,75 @@ import React, { Component } from 'react';
 import TitleBar from './TitleBar/TitleBar';
 import LoginPage from './LoginPage/LoginPage';
 import Playlists from './Playlists/Playlists';
+import TopTracks from './TopTracks/TopTracks';
 import './App.css';
 
 class App extends Component {
   state = {
-    userData: null,
-    playlists: null
+    userData: null
   };
 
   componentDidMount() {
-    const url = 'https://api.spotify.com'
-    const accessToken = new URLSearchParams(window.location.search).get('access_token');
+    const url = 'https://api.spotify.com';
 
-    if (accessToken) {
+    if (!localStorage.getItem('access_token')) {
+      if (new URLSearchParams(window.location.search).get('access_token')) {
+        localStorage.setItem('access_token', new URLSearchParams(window.location.search).get('access_token'));
+
+        fetch(`${url}/v1/me`, {
+          headers: { 'Authorization': 'Bearer ' + new URLSearchParams(window.location.search).get('access_token')}
+        }).then(response => response.json())
+        .then(data => {
+          this.setState({ 
+            userData: {
+              name: data.display_name,
+              id: data.id,
+              accessToken: new URLSearchParams(window.location.search).get('access_token')
+            }
+          });
+        });
+      }
+    } else {
       fetch(`${url}/v1/me`, {
-        headers: { 'Authorization': 'Bearer ' + accessToken }
+        headers: { 'Authorization': 'Bearer ' + localStorage.getItem('access_token')}
       }).then(response => response.json())
       .then(data => {
         this.setState({ 
           userData: {
             name: data.display_name,
-            id: data.id
+            id: data.id,
+            accessToken: localStorage.getItem('access_token')
           }
         });
-      });
-  
-      fetch(`${url}/v1/me/playlists`, {
-        headers: { 'Authorization': 'Bearer ' + accessToken }
-      }).then(res => res.json())
-      .then(data => {
-        this.setState({
-          playlists: data.items.map(item => ({
-            name: item.name,
-            imageUrl: item.images[0].url ? item.images[0].url : 'https://profile-images.scdn.co/images/userprofile/default/3c93d52857ecf3e40c4e8435adb7f9c1da40a0dd'
-          })
-        )});
       });
     }
   }
 
   clearUserData = () => {
+    localStorage.removeItem('access_token');
     this.setState({ userData: null });
   }
 
-  handleData = ({ userData, playlists }) => {
-    if (userData) {
-      return (
-        <>
-          <TitleBar
-            clearUserData={this.clearUserData}
-          />
-          <h1 style={{ width: '100%', textAlign: 'center' }}>Welcome to your Spotify, {userData.name}!</h1>
-          <Playlists
-            userData={userData}
-            playlists={playlists}
-            clearUserData={this.clearUserData}
-          />
-        </>
-      )
-    } else {
-      return (
-        <>
-          <LoginPage />
-        </>
-      );
-    }
-  }
-
   render() {
+    const { userData } = this.state;
+
+    if (!userData) return <LoginPage />;
+
     return (
-      <>{this.handleData(this.state)}</>
-    );
+      <>
+        <TitleBar
+          clearUserData={this.clearUserData}
+        />
+        <h1 style={{ width: '100%', textAlign: 'center' }}>Welcome to your Spotify, {userData.name}!</h1>
+        <div className='playlist-toptracks'>
+          <Playlists
+            accessToken={userData.accessToken}
+            clearUserData={this.clearUserData}
+          />
+          <TopTracks accessToken={userData.accessToken} />
+        </div>
+      </>
+    )
   }
 }
 

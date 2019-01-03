@@ -1,0 +1,10 @@
+.track-container {
+  width: 50%;
+  text-align: left;
+  padding: 0 20px;
+}
+
+.track-list {
+  margin: 0;
+  color: #1DB954;
+}

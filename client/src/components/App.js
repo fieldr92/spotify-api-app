@@ -16,6 +16,8 @@ class App extends Component {
     if (!localStorage.getItem('access_token')) {
       if (new URLSearchParams(window.location.search).get('access_token')) {
         localStorage.setItem('access_token', new URLSearchParams(window.location.search).get('access_token'));
+        localStorage.setItem('refresh_token', new URLSearchParams(window.location.search).get('refresh_token'));
+        this.setTokenExpiration();
 
         fetch(`${url}/v1/me`, {
           headers: { 'Authorization': 'Bearer ' + new URLSearchParams(window.location.search).get('access_token')}
@@ -46,8 +48,22 @@ class App extends Component {
     }
   }
 
+  setTokenExpiration = () => {
+    let expirationDuration = new URLSearchParams(window.location.search).get('expires_in')
+    const tokenExpiration = new Date();
+    tokenExpiration.setSeconds(new Date().getSeconds() + parseInt(expirationDuration));
+    if (!localStorage.getItem('token_expiration')) {
+      localStorage.setItem('token_expiration', tokenExpiration);
+    } else {
+      console.log(localStorage.getItem('token_expiration'));
+    }
+  }
+
   clearUserData = () => {
     localStorage.removeItem('access_token');
+    localStorage.removeItem('refresh_token');
+    localStorage.removeItem('expires_in');
+    localStorage.removeItem('token_expiration');
     this.setState({ userData: null });
   }
 
@@ -55,7 +71,7 @@ class App extends Component {
     const { userData } = this.state;
 
     if (!userData) return <LoginPage />;
-
+    
     return (
       <>
         <TitleBar

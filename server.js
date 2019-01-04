@@ -1,14 +1,14 @@
-let express = require('express');
-let request = require('request');
-let querystring = require('querystring');
+const express = require('express');
+const request = require('request');
+const querystring = require('querystring');
 
-let app = express();
+const app = express();
 
-let redirect_uri = 
+const redirect_uri = 
   process.env.REDIRECT_URI || 
   'http://localhost:8888/callback';
 
-app.get('/login', function(req, res) {
+app.get('/login', (req, res) => {
   res.redirect('https://accounts.spotify.com/authorize?' +
     querystring.stringify({
       response_type: 'code',
@@ -18,9 +18,9 @@ app.get('/login', function(req, res) {
     }));
 });
 
-app.get('/callback', function(req, res) {
-  let code = req.query.code || null;
-  let authOptions = {
+app.get('/callback', (req, res) => {
+  const code = req.query.code || null;
+  const authOptions = {
     url: 'https://accounts.spotify.com/api/token',
     form: {
       code: code,
@@ -34,13 +34,17 @@ app.get('/callback', function(req, res) {
     },
     json: true
   }
-  request.post(authOptions, function(error, response, body) {
-    var access_token = body.access_token;
-    let uri = process.env.FRONTEND_URI || 'http://localhost:3000';
-    res.redirect(uri + '?access_token=' + access_token);
+  request.post(authOptions, (error, response, body) => {
+    const access_token = body.access_token;
+    const expires_in = body.expires_in;
+    const refresh_token = body.refresh_token;
+    const uri = process.env.FRONTEND_URI || 'http://localhost:3000';
+    res.redirect(
+      uri + '?access_token=' + access_token + '&refresh_token=' + refresh_token + '&expires_in=' + expires_in
+    );
   });
 });
 
-let port = process.env.PORT || 8888;
+const port = process.env.PORT || 8888;
 console.log(`Listening on port ${port}. Go /login to initiate authentication flow.`);
 app.listen(port);

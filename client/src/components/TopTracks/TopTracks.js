@@ -23,7 +23,6 @@ class TopTracks extends Component {
             albumArt: item.album.images[2].url
           })
         )});
-        console.log(this.state.tracks);
       });
     }
   }

@@ -1,12 +1,18 @@
 const express = require('express');
 const request = require('request');
 const querystring = require('querystring');
+const bodyParser = require('body-parser');
 
 const app = express();
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
 
 const redirect_uri = 
   process.env.REDIRECT_URI || 
   'http://localhost:8888/callback';
+
+let access_token = null;
+let refresh_token = null;
 
 app.get('/login', (req, res) => {
   res.redirect('https://accounts.spotify.com/authorize?' +
@@ -33,15 +39,39 @@ app.get('/callback', (req, res) => {
       ).toString('base64'))
     },
     json: true
-  }
-  request.post(authOptions, (error, response, body) => {
-    const access_token = body.access_token;
-    const expires_in = body.expires_in;
-    const refresh_token = body.refresh_token;
-    const uri = process.env.FRONTEND_URI || 'http://localhost:3000';
-    res.redirect(
-      uri + '?access_token=' + access_token + '&refresh_token=' + refresh_token + '&expires_in=' + expires_in
-    );
+  };
+  request.post(authOptions, (err, response, body) => {
+    if (!err && response.statusCode === 200) {
+      access_token = body.access_token;
+      refresh_token = body.refresh_token;
+      const uri = process.env.FRONTEND_URI || 'http://localhost:3000';
+      res.redirect(uri + '?access_token=' + access_token);
+    }
+  });
+});
+
+app.get('/refresh_token', (req, res) => {
+  const authOptions = {
+    url: 'https://accounts.spotify.com/api/token',
+    headers: {
+      'Authorization': 'Basic ' + (new Buffer(
+        process.env.SPOTIFY_CLIENT_ID + ':' + process.env.SPOTIFY_CLIENT_SECRET
+      ).toString('base64'))
+    },
+    form: {
+      grant_type: 'refresh_token',
+      refresh_token: refresh_token
+    },
+    json: true
+  };
+  request.post(authOptions, (err, response, body) => {
+    if (!err && response.statusCode === 200) {
+      access_token = body.access_token;
+      const uri = process.env.FRONTEND_URI || 'http://localhost:3000';
+      res.redirect(uri + '?access_token=' + access_token);
+    } else {
+      console.log(err);
+    }
   });
 });
 

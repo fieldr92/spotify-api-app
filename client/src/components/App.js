@@ -16,26 +16,18 @@ class App extends Component {
     if (!localStorage.getItem('access_token')) {
       if (new URLSearchParams(window.location.search).get('access_token')) {
         localStorage.setItem('access_token', new URLSearchParams(window.location.search).get('access_token'));
-        localStorage.setItem('refresh_token', new URLSearchParams(window.location.search).get('refresh_token'));
-        this.setTokenExpiration();
-
-        fetch(`${url}/v1/me`, {
-          headers: { 'Authorization': 'Bearer ' + new URLSearchParams(window.location.search).get('access_token')}
-        }).then(response => response.json())
-        .then(data => {
-          this.setState({ 
-            userData: {
-              name: data.display_name,
-              id: data.id,
-              accessToken: new URLSearchParams(window.location.search).get('access_token')
-            }
-          });
-        });
+        this.fetchUserData(url);
       }
     } else {
       fetch(`${url}/v1/me`, {
         headers: { 'Authorization': 'Bearer ' + localStorage.getItem('access_token')}
-      }).then(response => response.json())
+      }).then(res => {
+        if (res.status === 401) {
+          this.clearUserData();
+          window.location = "http://localhost:8888/refresh_token";
+        };
+        return res.json();
+      })
       .then(data => {
         this.setState({ 
           userData: {
@@ -48,22 +40,29 @@ class App extends Component {
     }
   }
 
-  setTokenExpiration = () => {
-    let expirationDuration = new URLSearchParams(window.location.search).get('expires_in')
-    const tokenExpiration = new Date();
-    tokenExpiration.setSeconds(new Date().getSeconds() + parseInt(expirationDuration));
-    if (!localStorage.getItem('token_expiration')) {
-      localStorage.setItem('token_expiration', tokenExpiration);
-    } else {
-      console.log(localStorage.getItem('token_expiration'));
-    }
+  fetchUserData = (url) => {
+    fetch(`${url}/v1/me`, {
+      headers: { 'Authorization': 'Bearer ' + new URLSearchParams(window.location.search).get('access_token')}
+    }).then(res => {
+      if (res.status === 401) {
+        this.clearUserData();
+        window.location = "http://localhost:8888/refresh_token";
+      };
+      return res.json();
+    })
+    .then(data => {
+      this.setState({ 
+        userData: {
+          name: data.display_name,
+          id: data.id,
+          accessToken: new URLSearchParams(window.location.search).get('access_token')
+        }
+      });
+    });
   }
 
   clearUserData = () => {
     localStorage.removeItem('access_token');
-    localStorage.removeItem('refresh_token');
-    localStorage.removeItem('expires_in');
-    localStorage.removeItem('token_expiration');
     this.setState({ userData: null });
   }
 

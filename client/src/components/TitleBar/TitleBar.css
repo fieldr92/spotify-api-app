@@ -2,7 +2,8 @@
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-  background-color: #FFFFFF;
+  background-color: #191414;
+  border-bottom: 1px solid #525252;
   height: 100px;
   line-height: 100px;
   vertical-align: middle;
@@ -10,12 +11,16 @@
 }
 
 .title-logo {
-  width: 100px;
+  width: 70px;
+  height: 70px;
+  padding: 15px 0;
 }
 
 .title {
-  color: #1DB954;
+  color: #FFFFFF;
   margin: 0;
+  display: flex;
+  flex-direction: row;
 }
 
 button {
@@ -24,6 +29,7 @@ button {
   font-weight: 700;
   border-radius: 5px;
   background-color: #191414;
+  border: 1px solid #707070;
   color: #1DB954;
   padding: 10px;
 }

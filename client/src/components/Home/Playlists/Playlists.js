@@ -18,7 +18,9 @@ class Playlists extends Component {
         this.setState({
           playlists: data.items.map(item => ({
             name: item.name,
-            imageUrl: item.images[0].url ? item.images[0].url : 'https://profile-images.scdn.co/images/userprofile/default/3c93d52857ecf3e40c4e8435adb7f9c1da40a0dd'
+            imageUrl: item.images.length > 0 && item.images[0].url
+              ? item.images[0].url
+              : './assets/Spotify_Icon.png'
           })
         )});
       });

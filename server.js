@@ -2,17 +2,16 @@ const express = require('express');
 const request = require('request');
 const querystring = require('querystring');
 const bodyParser = require('body-parser');
+const cors = require('cors');
 
 const app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+app.use(cors());
 
 const redirect_uri = 
   process.env.REDIRECT_URI || 
   'http://localhost:8888/callback';
-
-let access_token = null;
-let refresh_token = null;
 
 app.get('/login', (req, res) => {
   res.redirect('https://accounts.spotify.com/authorize?' +
@@ -42,15 +41,16 @@ app.get('/callback', (req, res) => {
   };
   request.post(authOptions, (err, response, body) => {
     if (!err && response.statusCode === 200) {
-      access_token = body.access_token;
-      refresh_token = body.refresh_token;
+      const access_token = body.access_token;
+      const refresh_token = body.refresh_token;
       const uri = process.env.FRONTEND_URI || 'http://localhost:3000';
-      res.redirect(uri + '?access_token=' + access_token);
+      res.redirect(uri + '?access_token=' + access_token + '&refresh_token=' + refresh_token);
     }
   });
 });
 
-app.get('/refresh_token', (req, res) => {
+app.post('/refresh_token', (req, res) => {
+  const refresh_token = req.body.refresh_token;
   const authOptions = {
     url: 'https://accounts.spotify.com/api/token',
     headers: {
@@ -60,17 +60,14 @@ app.get('/refresh_token', (req, res) => {
     },
     form: {
       grant_type: 'refresh_token',
-      refresh_token: refresh_token
+      refresh_token
     },
     json: true
   };
   request.post(authOptions, (err, response, body) => {
     if (!err && response.statusCode === 200) {
-      access_token = body.access_token;
-      const uri = process.env.FRONTEND_URI || 'http://localhost:3000';
-      res.redirect(uri + '?access_token=' + access_token);
-    } else {
-      console.log(err);
+      const access_token = body.access_token;
+      res.send(JSON.stringify({ access_token: access_token }));
     }
   });
 });

@@ -8,10 +8,10 @@ class TopTracks extends Component {
 
   componentDidMount() {
     const url = 'https://api.spotify.com'
-    const accessToken = this.props.accessToken;
+    const { accessToken } = this.props;
 
     if (accessToken) {
-      fetch(`${url}/v1/me/top/tracks?limit=20`, {
+      fetch(`${url}/v1/me/top/tracks?limit=20&time_range=short_term`, {
         headers: { 'Authorization': 'Bearer ' + accessToken }
       }).then(res => res.json())
       .then(data => {
@@ -32,7 +32,9 @@ class TopTracks extends Component {
 
     if (tracks) {
       return tracks.map((track, i) => (
-          <li className='track-list' key={`track${i}`}>{track.name} - {track.artists.length > 1 ? track.artists.join(' / ') : track.artists}</li>
+          <li className='track-list' key={`track${i}`}>
+            {track.name} - {track.artists.length > 1 ? track.artists.join(' / ') : track.artists}
+          </li>
         )
       );
     }

@@ -4,8 +4,3 @@ body {
   color: #FFFFFF;
   margin: 0;
 }
-
-.playlist-toptracks {
-  display: flex;
-  flex-direction: row;
-}

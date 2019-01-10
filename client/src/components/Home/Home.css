@@ -1,0 +1,4 @@
+.playlist-toptracks {
+  display: flex;
+  flex-direction: row;
+}

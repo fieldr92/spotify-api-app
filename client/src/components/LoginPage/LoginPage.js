@@ -18,12 +18,12 @@ const LoginPage = () => {
   return (
     <div className='login-container'>
       <h1>Please login to access data...</h1>
-      <button
+      {/* <button
         onClick={() => window.location='http://localhost:8888/login'}
         className='login-button'
       >
         Login to Spotify
-      </button>
+      </button> */}
       {/* <p style={{ color: 'white' }}>
         {quote}
       </p> */}

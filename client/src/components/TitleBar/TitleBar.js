@@ -11,7 +11,7 @@ const loginLogout = (userData, clearUserData) => {
     </button>
   }
   return <button onClick={() => {
-    // window.location = 'http://localhost:3000';
+    window.location = 'http://localhost:3000';
     clearUserData();
   }}>
     Log Out

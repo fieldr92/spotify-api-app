@@ -32,4 +32,9 @@ button {
   border: 1px solid #707070;
   color: #1DB954;
   padding: 10px;
+  outline: none;
 }
+
+button:hover { cursor: pointer; }
+
+button:active { background-color: #2e2e2e;}

@@ -7,29 +7,28 @@ class TopTracks extends Component {
   }
 
   componentDidMount() {
-    const url = 'https://api.spotify.com'
+    const url = 'https://api.spotify.com';
     const { accessToken } = this.props;
+    if (accessToken) this.fetchTopTracks(accessToken, url);
+  }
 
-    if (accessToken) {
-      fetch(`${url}/v1/me/top/tracks?limit=20&time_range=short_term`, {
-        headers: { 'Authorization': 'Bearer ' + accessToken }
-      }).then(res => res.json())
-      .then(data => {
-        this.setState({
-          tracks: data.items.map(item => ({
-            artists: item.artists.map(artist => (artist.name)),
-            name: item.name,
-            album: item.album.name,
-            albumArt: item.album.images[2].url
-          })
-        )});
-      });
-    }
+  fetchTopTracks = async (accessToken, url) => {
+    const res = await fetch(`${url}/v1/me/top/tracks?limit=20&time_range=long_term`, {
+      headers: { 'Authorization': 'Bearer ' + accessToken }
+    })
+    const data = await res.json();
+    this.setState({
+      tracks: data.items.map(item => ({
+        artists: item.artists.map(artist => (artist.name)),
+        name: item.name,
+        album: item.album.name,
+        albumArt: item.album.images[2].url
+      })
+    )});
   }
 
   mapTracks = () => {
     const { tracks } = this.state;
-
     if (tracks) {
       return tracks.map((track, i) => (
           <li className='track-list' key={`track${i}`}>

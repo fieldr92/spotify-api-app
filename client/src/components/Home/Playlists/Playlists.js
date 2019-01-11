@@ -7,29 +7,28 @@ class Playlists extends Component {
   }
 
   componentDidMount() {
-    const url = 'https://api.spotify.com'
-    const accessToken = this.props.accessToken;
+    const url = 'https://api.spotify.com';
+    const { accessToken } = this.props;
+    if (accessToken) this.fetchPlaylists(accessToken, url);
+  }
 
-    if (accessToken) {
-      fetch(`${url}/v1/me/playlists`, {
-        headers: { 'Authorization': 'Bearer ' + accessToken }
-      }).then(res => res.json())
-      .then(data => {
-        this.setState({
-          playlists: data.items.map(item => ({
-            name: item.name,
-            imageUrl: item.images.length > 0 && item.images[0].url
-              ? item.images[0].url
-              : './assets/Spotify_Icon.png'
-          })
-        )});
-      });
-    }
+  fetchPlaylists = async (accessToken, url) => {
+    const res = await fetch(`${url}/v1/me/playlists`, {
+      headers: { 'Authorization': 'Bearer ' + accessToken }
+    })
+    const data = await res.json();
+    this.setState({
+      playlists: data.items.map(item => ({
+        name: item.name,
+        imageUrl: item.images.length > 0 && item.images[0].url
+          ? item.images[0].url
+          : './assets/Spotify_Icon.png'
+      })
+    )});
   }
 
   mapPlaylists = () => {
     const { playlists } = this.state;
-
     return playlists
       ? playlists.map((playlist, i) => {
         return (

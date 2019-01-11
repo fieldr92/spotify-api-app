@@ -28,38 +28,36 @@ class App extends Component {
       headers: { 'Authorization': 'Bearer ' + localStorage.getItem('access_token')}
     })
     const data = await this.tryResponseData(res, url);
-    this.setState({
-      userData: {
-        name: data.display_name,
-        id: data.id,
-        accessToken: localStorage.getItem('access_token')
-      }
-    });
+    this.setState({ userData: {
+      name: data.display_name,
+      id: data.id,
+      accessToken: localStorage.getItem('access_token')
+    }});
     return data;
   }
 
   tryResponseData = (res, url) => {
     try {
       if (res.ok) return res.json();
-      throw new Error('Token expired');
+      throw new Error('Access token expired...');
     } catch (err) {
-      console.log(err);
+      console.log(err.message);
       return this.refreshAccessToken(url);
     }
   }
 
   refreshAccessToken = async url => {
-    console.log('Getting new access_token...');
+    console.log('Getting new access token...');
     const res = await fetch('http://localhost:8888/refresh_token', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({ refresh_token: localStorage.getItem('refresh_token') })
-    })
+    });
     const token = await res.json();
     const data = await this.setNewAccessToken(token, url);
-    console.log('New access token received!')
+    console.log('New access token received!');
     return data;
   }
 
@@ -74,31 +72,24 @@ class App extends Component {
     this.setState({ userData: null });
   }
 
+  conditionalRender = userData => {
+    if (!userData) return <LoginPage />
+    return <Home
+      userData={userData}
+      clearUserData={this.clearUserData}
+    />
+  }
+
   render() {
     const { userData } = this.state;
-
-    if (!userData) return (
-      <>
-        <TitleBar
-          userData={userData}
-          clearUserData={this.clearUserData}
-        />
-        <LoginPage />
-      </>
-    );
     
-    return (
-      <>
-        <TitleBar
-          userData={userData}
-          clearUserData={this.clearUserData}
-        />
-        <Home
-          userData={userData}
-          clearUserData={this.clearUserData}
-        />
-      </>
-    )
+    return <>
+      <TitleBar
+        userData={userData}
+        clearUserData={this.clearUserData}
+      />
+      {this.conditionalRender(userData)}
+    </>
   }
 }
 

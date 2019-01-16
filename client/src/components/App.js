@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-// import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 import TitleBar from './TitleBar/TitleBar';
 import Home from './Home/Home';
 import LoginPage from './LoginPage/LoginPage';
@@ -12,10 +11,17 @@ class App extends Component {
 
   componentDidMount() {
     const url = 'https://api.spotify.com';
+    const { search } = window.location;
     if (!localStorage.getItem('access_token')) {
-      if (new URLSearchParams(window.location.search).get('access_token')) {
-        localStorage.setItem('access_token', new URLSearchParams(window.location.search).get('access_token'));
-        localStorage.setItem('refresh_token', new URLSearchParams(window.location.search).get('refresh_token'));
+      if (new URLSearchParams(search).get('access_token')) {
+        localStorage.setItem(
+          'access_token',
+          new URLSearchParams(search).get('access_token')
+        );
+        localStorage.setItem(
+          'refresh_token',
+          new URLSearchParams(search).get('refresh_token')
+        );
         this.fetchUserData(url);
       }
     } else {
@@ -25,16 +31,21 @@ class App extends Component {
 
   fetchUserData = async url => {
     const res = await fetch(`${url}/v1/me`, {
-      headers: { 'Authorization': 'Bearer ' + localStorage.getItem('access_token')}
-    })
+      headers: {
+        Authorization: 'Bearer ' + localStorage.getItem('access_token')
+      }
+    });
     const data = await this.tryResponseData(res, url);
-    this.setState({ userData: {
-      name: data.display_name,
-      id: data.id,
-      accessToken: localStorage.getItem('access_token')
-    }});
+    const { display_name, id } = data;
+    this.setState({
+      userData: {
+        name: display_name,
+        id: id,
+        accessToken: localStorage.getItem('access_token')
+      }
+    });
     return data;
-  }
+  };
 
   tryResponseData = (res, url) => {
     try {
@@ -44,7 +55,7 @@ class App extends Component {
       console.log(err.message);
       return this.refreshAccessToken(url);
     }
-  }
+  };
 
   refreshAccessToken = async url => {
     console.log('Getting new access token...');
@@ -53,43 +64,41 @@ class App extends Component {
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ refresh_token: localStorage.getItem('refresh_token') })
+      body: JSON.stringify({
+        refresh_token: localStorage.getItem('refresh_token')
+      })
     });
     const token = await res.json();
     const data = await this.setNewAccessToken(token, url);
     console.log('New access token received!');
     return data;
-  }
+  };
 
   setNewAccessToken = (token, url) => {
     localStorage.setItem('access_token', token.access_token);
     return this.fetchUserData(url);
-  }
+  };
 
   clearUserData = () => {
     localStorage.removeItem('access_token');
     localStorage.removeItem('refresh_token');
     this.setState({ userData: null });
-  }
+  };
 
   conditionalRender = userData => {
-    if (!userData) return <LoginPage />
-    return <Home
-      userData={userData}
-      clearUserData={this.clearUserData}
-    />
-  }
+    if (!userData) return <LoginPage />;
+    return <Home userData={userData} clearUserData={this.clearUserData} />;
+  };
 
   render() {
     const { userData } = this.state;
-    
-    return <>
-      <TitleBar
-        userData={userData}
-        clearUserData={this.clearUserData}
-      />
-      {this.conditionalRender(userData)}
-    </>
+
+    return (
+      <>
+        <TitleBar userData={userData} clearUserData={this.clearUserData} />
+        {this.conditionalRender(userData)}
+      </>
+    );
   }
 }
 

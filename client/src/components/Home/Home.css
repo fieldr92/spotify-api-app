@@ -1,4 +1,29 @@
-.playlist-toptracks {
+.route-menu {
+  width: 100%;
+  height: 40px;
+  border-bottom: 1px solid #525252;
+}
+
+.route-menu ul {
+  padding: 0;
+  list-style-type: none;
+}
+
+.route-list {
   display: flex;
   flex-direction: row;
+  width: 80%;
+  line-height: 40px;
+  vertical-align: middle;
+  margin: 0 auto;
+  justify-content: space-between;
+}
+
+.route-list li {
+  color: white;
+}
+
+.container {
+  width: 80%;
+  margin: 0 auto;
 }

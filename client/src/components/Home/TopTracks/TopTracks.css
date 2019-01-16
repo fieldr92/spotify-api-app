@@ -1,7 +1,7 @@
 .track-container {
-  width: 50%;
+  width: 60%;
   text-align: left;
-  padding: 0 20px;
+  margin: 0 auto;
 }
 
 .track-list {

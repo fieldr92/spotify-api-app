@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import CurrentSong from '../CurrentSong/CurrentSong';
 import './Playlists.css';
 
 class Playlists extends Component {
@@ -49,11 +50,16 @@ class Playlists extends Component {
   };
 
   render() {
+    const { accessToken } = this.props;
+
     return (
-      <div className="playlist-container">
-        <h3 className="playlists-title">Your playlists</h3>
-        {this.mapPlaylists()}
-      </div>
+      <>
+        <CurrentSong accessToken={accessToken} />
+        <div className="playlist-container">
+          <h3 className="playlists-title">Your playlists</h3>
+          {this.mapPlaylists()}
+        </div>
+      </>
     );
   }
 }

@@ -25,7 +25,8 @@ app.get('/login', (req, res) => {
       querystring.stringify({
         response_type: 'code',
         client_id: SPOTIFY_CLIENT_ID,
-        scope: 'user-read-private user-read-email user-top-read',
+        scope:
+          'user-read-private user-read-email user-top-read user-modify-playback-state user-read-currently-playing user-read-playback-state',
         redirect_uri
       })
   );

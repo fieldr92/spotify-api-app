@@ -1,10 +1,26 @@
 .track-container {
-  width: 60%;
+  width: 80%;
   text-align: left;
   margin: 0 auto;
 }
 
-.track-list {
-  margin: 0;
-  color: #1DB954;
+.top-selector {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
+
+.top-selector h3 {
+  line-height: 25px;
+  margin: 15px 0;
+}
+
+.top-selector select {
+  height: 25px;
+  margin: 15px 15px;
+  outline: none;
+  background-color: #2e2e2e;
+  color: #1db954;
+  font-size: 15px;
+  font-family: inherit;
 }

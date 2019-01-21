@@ -1,0 +1,43 @@
+.track-card {
+  margin: 0;
+  padding: 10px;
+  color: #1db954;
+  display: flex;
+  flex-direction: row;
+}
+
+.track-card:nth-child(odd) {
+  background: #252525;
+}
+
+.track-card:nth-child(even) {
+  background: #353535;
+}
+
+.track-card img {
+  width: 150px;
+  height: 150px;
+  cursor: pointer;
+}
+
+.track-info {
+  display: block;
+  padding: 0 20px;
+  display: block;
+  align-items: middle;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.track-info h2 {
+  line-height: 100%;
+  vertical-align: center;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.track-info p {
+  line-height: 100%;
+  vertical-align: center;
+}

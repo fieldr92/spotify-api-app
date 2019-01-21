@@ -3,61 +3,54 @@ import './TrackCard.css';
 
 class TrackCard extends Component {
   state = {
-    playing: false,
-    active: false
-  };
-
-  static getDerivedStateFromProps = (nextProps, prevState) => {
-    if (nextProps.playing !== prevState.playing)
-      return { playing: nextProps.playing };
-    return null;
+    playing: false
   };
 
   handlePlayPause = () => {
-    const { accessToken, uri, playing, active } = this.props;
-    console.log('active', active);
-    console.log('playing', playing);
-    if (!playing) return this.playSong(accessToken, uri);
-    return this.pauseSong(accessToken);
+    const { accessToken, i } = this.props;
+    const { uri, active } = this.props.track;
+    const { playing } = this.state;
+    if (!active) return this.playNewSong(accessToken, active, uri, i);
+    if (active && !playing) return this.resumeSong(accessToken, active, i);
+    return this.pauseSong(accessToken, active, i);
   };
 
-  playSong = async (accessToken, uri) => {
+  playNewSong = async (accessToken, active, uri, i) => {
     const url = 'https://api.spotify.com';
-    const { setActiveSongState, active, i } = this.props;
-    const { playing } = this.state;
-    if (!playing) {
-      console.log('playNewSong');
-      try {
-        const res = await fetch(`${url}/v1/me/player/play`, {
-          method: 'PUT',
-          headers: { Authorization: 'Bearer ' + accessToken },
-          body: JSON.stringify({ uris: [uri] })
-        });
-        if (res.ok) {
-          return setActiveSongState(!active, i);
-        }
-        throw new Error('Playback failed...');
-      } catch (err) {
-        return console.log(err.message);
+    const { setActiveSongState } = this.props;
+    try {
+      const res = await fetch(`${url}/v1/me/player/play`, {
+        method: 'PUT',
+        headers: { Authorization: 'Bearer ' + accessToken },
+        body: JSON.stringify({ uris: [uri] })
+      });
+      if (res.ok) {
+        return this.setState({ playing: true }, setActiveSongState(!active, i));
       }
+      throw new Error('New song playback failed...');
+    } catch (err) {
+      return console.log(err.message);
     }
-    console.log('resumeSong');
+  };
+
+  resumeSong = async accessToken => {
+    const url = 'https://api.spotify.com';
     try {
       const res = await fetch(`${url}/v1/me/player/play`, {
         method: 'PUT',
         headers: { Authorization: 'Bearer ' + accessToken }
       });
       if (res.ok) {
-        return setActiveSongState(!active, i);
+        return this.setState({ playing: true });
       }
-      throw new Error('Playback failed...');
+      throw new Error('Resume playback failed...');
     } catch (err) {
       return console.log(err.message);
     }
   };
 
-  pauseSong = async () => {
-    const { accessToken, setActiveSongState, active, i } = this.props;
+  pauseSong = async (accessToken, active, i) => {
+    const { setActiveSongState } = this.props;
     const url = 'https://api.spotify.com';
     try {
       const res = await fetch(`${url}/v1/me/player/pause`, {
@@ -65,8 +58,7 @@ class TrackCard extends Component {
         headers: { Authorization: 'Bearer ' + accessToken }
       });
       if (res.ok) {
-        console.log('pauseSong');
-        return setActiveSongState(active, i);
+        return this.setState({ playing: false }, setActiveSongState(active, i));
       }
       throw new Error('Pausing failed...');
     } catch (err) {
@@ -75,7 +67,8 @@ class TrackCard extends Component {
   };
 
   render() {
-    const { artists, name, album, albumArt, i } = this.props;
+    const { i } = this.props;
+    const { artists, name, album, albumArt } = this.props.track;
 
     return (
       <>

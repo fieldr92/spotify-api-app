@@ -5,8 +5,7 @@ import './TopTracks.css';
 class TopTracks extends Component {
   state = {
     tracks: null,
-    optionValue: 'short_term',
-    playing: false
+    optionValue: 'short_term'
   };
 
   componentDidMount() {
@@ -37,6 +36,7 @@ class TopTracks extends Component {
         album: album.name,
         albumArt: album.images[1].url,
         uri,
+        playing: false,
         active: false
       }))
     });
@@ -44,18 +44,15 @@ class TopTracks extends Component {
 
   setActiveSongState = (active, i) => {
     const { tracks } = this.state;
-    console.log('setActive', active);
     this.setState({
       tracks: tracks.map((track, index) => {
         const copyTrack = { ...track };
         if (index === i) {
           if (active) {
             copyTrack.active = true;
-            this.setState({ playing: true });
             return copyTrack;
           }
           copyTrack.active = false;
-          this.setState({ playing: false });
           return copyTrack;
         }
         copyTrack.active = false;
@@ -65,26 +62,18 @@ class TopTracks extends Component {
   };
 
   mapTrackCards = () => {
-    const { tracks, playing } = this.state;
+    const { tracks } = this.state;
     const { accessToken } = this.props;
     if (tracks) {
-      return tracks.map(
-        ({ artists, name, id, album, albumArt, uri, active }, i) => (
-          <TrackCard
-            artists={artists}
-            name={name}
-            album={album}
-            albumArt={albumArt}
-            i={i}
-            accessToken={accessToken}
-            uri={uri}
-            active={active}
-            playing={playing}
-            setActiveSongState={this.setActiveSongState}
-            key={id}
-          />
-        )
-      );
+      return tracks.map(({ id, ...track }, i) => (
+        <TrackCard
+          accessToken={accessToken}
+          track={track}
+          setActiveSongState={this.setActiveSongState}
+          i={i}
+          key={id}
+        />
+      ));
     }
   };
 

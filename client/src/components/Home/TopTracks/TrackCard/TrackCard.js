@@ -24,9 +24,8 @@ class TrackCard extends Component {
         headers: { Authorization: 'Bearer ' + accessToken },
         body: JSON.stringify({ uris: [uri] })
       });
-      if (res.ok) {
+      if (res.ok)
         return this.setState({ playing: true }, setActiveSongState(!active, i));
-      }
       throw new Error('New song playback failed...');
     } catch (err) {
       return console.log(err.message);
@@ -40,9 +39,7 @@ class TrackCard extends Component {
         method: 'PUT',
         headers: { Authorization: 'Bearer ' + accessToken }
       });
-      if (res.ok) {
-        return this.setState({ playing: true });
-      }
+      if (res.ok) return this.setState({ playing: true });
       throw new Error('Resume playback failed...');
     } catch (err) {
       return console.log(err.message);
@@ -50,16 +47,15 @@ class TrackCard extends Component {
   };
 
   pauseSong = async (accessToken, active, i) => {
-    const { setActiveSongState } = this.props;
     const url = 'https://api.spotify.com';
+    const { setActiveSongState } = this.props;
     try {
       const res = await fetch(`${url}/v1/me/player/pause`, {
         method: 'PUT',
         headers: { Authorization: 'Bearer ' + accessToken }
       });
-      if (res.ok) {
+      if (res.ok)
         return this.setState({ playing: false }, setActiveSongState(active, i));
-      }
       throw new Error('Pausing failed...');
     } catch (err) {
       console.log(err.message);
@@ -67,24 +63,21 @@ class TrackCard extends Component {
   };
 
   render() {
-    const { i } = this.props;
     const { artists, name, album, albumArt } = this.props.track;
 
     return (
-      <>
-        <div className="track-card">
-          <img
-            src={albumArt}
-            alt={`Album Art for ${album}`}
-            onClick={this.handlePlayPause}
-          />
-          <div className="track-info">
-            <h2>{`${i + 1}. ${name}`}</h2>
-            <p>{artists.length > 1 ? artists.join(' / ') : artists}</p>
-            <p>{album}</p>
-          </div>
+      <div className="track-card">
+        <img
+          src={albumArt}
+          alt={`Album Art for ${album}`}
+          onClick={this.handlePlayPause}
+        />
+        <div className="track-info">
+          <h2>{`${name}`}</h2>
+          <p>{artists.length > 1 ? artists.join(' / ') : artists}</p>
+          <p>{album}</p>
         </div>
-      </>
+      </div>
     );
   }
 }

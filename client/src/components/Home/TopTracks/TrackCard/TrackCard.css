@@ -20,6 +20,7 @@ tr:last-child td:last-child {
 }
 
 .album-art img {
+  display: block;
   width: 70px;
   height: 70px;
   padding: 10px;

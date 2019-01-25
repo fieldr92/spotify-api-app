@@ -21,25 +21,30 @@ class TopTracks extends Component {
   };
 
   fetchTopTracks = async accessToken => {
-    const url = 'https://api.spotify.com';
-    const { optionValue } = this.state;
-    const res = await fetch(
-      `${url}/v1/me/top/tracks?limit=20&time_range=${optionValue}`,
-      { headers: { Authorization: `Bearer ${accessToken}` } }
-    );
-    const data = await res.json();
-    this.setState({
-      tracks: data.items.map(({ artists, name, album, id, uri }) => ({
-        artists: artists.map(artist => artist.name),
-        name,
-        id,
-        album: album.name,
-        albumArt: album.images[1].url,
-        uri,
-        playing: false,
-        active: false
-      }))
-    });
+    try {
+      const url = 'https://api.spotify.com';
+      const { optionValue } = this.state;
+      const res = await fetch(
+        `${url}/v1/me/top/tracks?limit=20&time_range=${optionValue}`,
+        { headers: { Authorization: `Bearer ${accessToken}` } }
+      );
+      const data = await res.json();
+      this.setState({
+        tracks: data.items.map(({ artists, name, album, id, uri }) => ({
+          artists: artists.map(artist => artist.name),
+          name,
+          id,
+          album: album.name,
+          albumArt: album.images[1].url,
+          uri,
+          playing: false,
+          active: false
+        }))
+      });
+    } catch (err) {
+      console.log(err);
+      window.location('http://localhost:3000/toptracks');
+    }
   };
 
   setActiveSongState = (active, i) => {
@@ -88,7 +93,7 @@ class TopTracks extends Component {
             <option value="long_term">Past year</option>
           </select>
         </div>
-        <table>
+        <table cellSpacing="1">
           <thead className="table-head">
             <tr>
               <th>Play Song</th>

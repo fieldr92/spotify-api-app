@@ -27,20 +27,21 @@
 
 table {
   margin: 20px auto;
+  max-width: 800px;
 }
 
 .table-head th {
   text-align: center;
   height: 30px;
-  background-color: #1db954;
+  background-color: white;
   color: #2e2e2e;
   font-weight: normal;
 }
 
-th:first-child {
+.table-head th:first-child {
   border-top-left-radius: 5px;
 }
 
-th:last-child {
+.table-head th:last-child {
   border-top-right-radius: 5px;
 }

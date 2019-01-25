@@ -88,7 +88,17 @@ class TopTracks extends Component {
             <option value="long_term">Past year</option>
           </select>
         </div>
-        <div className="track-card-container">{this.mapTrackCards()}</div>
+        <table>
+          <thead className="table-head">
+            <tr>
+              <th>Play Song</th>
+              <th>Title</th>
+              <th>Artist</th>
+              <th>Album</th>
+            </tr>
+          </thead>
+          <tbody>{this.mapTrackCards()}</tbody>
+        </table>
       </div>
     );
   }

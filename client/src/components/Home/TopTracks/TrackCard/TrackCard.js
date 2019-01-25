@@ -66,18 +66,20 @@ class TrackCard extends Component {
     const { artists, name, album, albumArt } = this.props.track;
 
     return (
-      <div className="track-card">
-        <img
-          src={albumArt}
-          alt={`Album Art for ${album}`}
-          onClick={this.handlePlayPause}
-        />
-        <div className="track-info">
-          <h2>{`${name}`}</h2>
-          <p>{artists.length > 1 ? artists.join(' / ') : artists}</p>
-          <p>{album}</p>
-        </div>
-      </div>
+      <tr className="track-row">
+        <td className="album-art">
+          <img
+            src={albumArt}
+            alt={`Album Art for ${album}`}
+            onClick={this.handlePlayPause}
+          />
+        </td>
+        <td className="track-info">{`${name}`}</td>
+        <td className="track-info">
+          {artists.length > 1 ? artists.join(' / ') : artists}
+        </td>
+        <td className="track-info">{album}</td>
+      </tr>
     );
   }
 }

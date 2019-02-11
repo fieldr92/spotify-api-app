@@ -1,14 +1,12 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
+import { fetchUserData, clearUserData } from '../actions';
 import TitleBar from './TitleBar/TitleBar';
 import Home from './Home/Home';
 import LoginPage from './LoginPage/LoginPage';
 import './App.css';
 
 class App extends Component {
-  state = {
-    userData: null
-  };
-
   componentDidMount() {
     const url = 'https://api.spotify.com';
     const { search } = window.location;
@@ -22,84 +20,59 @@ class App extends Component {
           'refresh_token',
           new URLSearchParams(search).get('refresh_token')
         );
-        this.fetchUserData(url);
+        this.props.fetchUserData(url);
       }
     } else {
-      this.fetchUserData(url);
+      this.props.fetchUserData(url);
     }
   }
 
-  fetchUserData = async url => {
-    const res = await fetch(`${url}/v1/me`, {
-      headers: {
-        Authorization: 'Bearer ' + localStorage.getItem('access_token')
-      }
-    });
-    const data = await this.tryResponseData(res, url);
-    const { display_name, id } = data;
-    this.setState({
-      userData: {
-        name: display_name,
-        id: id,
-        accessToken: localStorage.getItem('access_token')
-      }
-    });
-    return data;
-  };
+  // refreshAccessToken = async url => {
+  //   console.log('Getting new access token...');
+  //   const res = await fetch('http://localhost:8888/refresh_token', {
+  //     method: 'POST',
+  //     headers: {
+  //       'Content-Type': 'application/json'
+  //     },
+  //     body: JSON.stringify({
+  //       refresh_token: localStorage.getItem('refresh_token')
+  //     })
+  //   });
+  //   const token = await res.json();
+  //   const data = await this.setNewAccessToken(token, url);
+  //   console.log('New access token received!');
+  //   return data;
+  // };
 
-  tryResponseData = (res, url) => {
-    try {
-      if (res.ok) return res.json();
-      throw new Error('Access token expired...');
-    } catch (err) {
-      console.log(err.message);
-      return this.refreshAccessToken(url);
-    }
-  };
+  // setNewAccessToken = (token, url) => {
+  //   localStorage.setItem('access_token', token.access_token);
+  //   return this.fetchUserData(url);
+  // };
 
-  refreshAccessToken = async url => {
-    console.log('Getting new access token...');
-    const res = await fetch('http://localhost:8888/refresh_token', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        refresh_token: localStorage.getItem('refresh_token')
-      })
-    });
-    const token = await res.json();
-    const data = await this.setNewAccessToken(token, url);
-    console.log('New access token received!');
-    return data;
-  };
-
-  setNewAccessToken = (token, url) => {
-    localStorage.setItem('access_token', token.access_token);
-    return this.fetchUserData(url);
-  };
-
-  clearUserData = () => {
-    localStorage.removeItem('access_token');
-    localStorage.removeItem('refresh_token');
-    this.setState({ userData: null });
-  };
-
-  conditionalRender = userData => {
+  conditionalRender = () => {
+    const { userData } = this.props;
     if (!userData) return <LoginPage />;
-    return <Home userData={userData} clearUserData={this.clearUserData} />;
+    return <Home />;
   };
 
   render() {
-    const { userData } = this.state;
-
     return (
       <>
-        <TitleBar userData={userData} clearUserData={this.clearUserData} />
-        {this.conditionalRender(userData)}
+        <TitleBar />
+        {this.conditionalRender()}
       </>
     );
   }
 }
 
-export default App;
+const mapStateToProps = state => {
+  const { userData } = state.auth;
+  return {
+    userData
+  };
+};
+
+export default connect(
+  mapStateToProps,
+  { fetchUserData, clearUserData }
+)(App);

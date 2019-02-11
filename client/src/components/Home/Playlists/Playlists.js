@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
 import CurrentSong from '../CurrentSong/CurrentSong';
 import './Playlists.css';
 
@@ -9,7 +10,7 @@ class Playlists extends Component {
 
   componentDidMount() {
     const url = 'https://api.spotify.com';
-    const { accessToken } = this.props;
+    const { accessToken } = this.props.userData;
     if (accessToken) this.fetchPlaylists(accessToken, url);
   }
 
@@ -50,7 +51,7 @@ class Playlists extends Component {
   };
 
   render() {
-    const { accessToken } = this.props;
+    const { accessToken } = this.props.userData;
 
     return (
       <>
@@ -64,4 +65,10 @@ class Playlists extends Component {
   }
 }
 
-export default Playlists;
+const mapStateToProps = state => {
+  return {
+    userData: state.auth.userData
+  };
+};
+
+export default connect(mapStateToProps)(Playlists);

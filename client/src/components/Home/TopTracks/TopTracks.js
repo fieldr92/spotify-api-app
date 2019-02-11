@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
 import TrackCard from './TrackCard/TrackCard';
+import history from '../../../history';
 import './TopTracks.css';
 
 class TopTracks extends Component {
@@ -9,18 +11,16 @@ class TopTracks extends Component {
   };
 
   componentDidMount() {
-    const { accessToken } = this.props;
-    if (accessToken) this.fetchTopTracks(accessToken);
+    const { accessToken } = this.props.userData;
+    if (accessToken) this.fetchTopTracks();
   }
 
   handleSelect = e => {
-    const { accessToken } = this.props;
-    this.setState({ optionValue: e.target.value }, () =>
-      this.fetchTopTracks(accessToken)
-    );
+    this.setState({ optionValue: e.target.value }, () => this.fetchTopTracks());
   };
 
-  fetchTopTracks = async accessToken => {
+  fetchTopTracks = async () => {
+    const { accessToken } = this.props.userData;
     try {
       const url = 'https://api.spotify.com';
       const { optionValue } = this.state;
@@ -43,7 +43,7 @@ class TopTracks extends Component {
       });
     } catch (err) {
       console.log(err);
-      window.location('http://localhost:3000/toptracks');
+      history.push('/');
     }
   };
 
@@ -83,6 +83,7 @@ class TopTracks extends Component {
   };
 
   render() {
+    if (!this.state.tracks) return <div>Loading...</div>;
     return (
       <div className="track-container">
         <div className="top-selector">
@@ -109,4 +110,10 @@ class TopTracks extends Component {
   }
 }
 
-export default TopTracks;
+const mapStateToProps = state => {
+  return {
+    userData: state.auth.userData
+  };
+};
+
+export default connect(mapStateToProps)(TopTracks);

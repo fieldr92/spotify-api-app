@@ -1,43 +1,58 @@
-import React from 'react';
+import React, { Component } from 'react';
+import { connect } from 'react-redux';
+import { clearUserData } from '../../actions';
+import history from '../../history';
 import './TitleBar.css';
 
-const loginLogout = (userData, clearUserData) => {
-  if (!userData) {
+class TitleBar extends Component {
+  loginLogout = userData => {
+    if (!userData) {
+      return (
+        <button
+          onClick={() => (window.location = 'http://localhost:8888/login')}
+          className="login-button">
+          Log In
+        </button>
+      );
+    }
     return (
       <button
-        onClick={() => (window.location = 'http://localhost:8888/login')}
-        className="login-button">
-        Log In
+        onClick={() => {
+          history.push('/');
+          this.props.clearUserData();
+        }}>
+        Log Out
       </button>
     );
-  }
-  return (
-    <button
-      onClick={() => {
-        window.location = 'http://localhost:3000';
-        clearUserData();
-      }}>
-      Log Out
-    </button>
-  );
-};
+  };
 
-const TitleBar = ({ userData, clearUserData }) => {
-  return (
-    <>
-      <div className="title-bar">
-        <img
-          className="title-logo"
-          src="./assets/Spotify_Icon.png"
-          alt="Logo"
-        />
-        <h1 className="title">Ralph's Spotify App</h1>
-        <div style={{ textAlign: 'center' }}>
-          {loginLogout(userData, clearUserData)}
+  render() {
+    const { userData } = this.props;
+    return (
+      <>
+        <div className="title-bar">
+          <img
+            className="title-logo"
+            src="./assets/Spotify_Icon.png"
+            alt="Logo"
+          />
+          <h1 className="title">Ralph's Spotify App</h1>
+          <div style={{ textAlign: 'center' }}>
+            {this.loginLogout(userData)}
+          </div>
         </div>
-      </div>
-    </>
-  );
+      </>
+    );
+  }
+}
+
+const mapStateToProps = state => {
+  return {
+    userData: state.auth.userData
+  };
 };
 
-export default TitleBar;
+export default connect(
+  mapStateToProps,
+  { clearUserData }
+)(TitleBar);

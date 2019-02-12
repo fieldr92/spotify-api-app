@@ -12,15 +12,17 @@ class TopTracks extends Component {
 
   componentDidMount() {
     const { accessToken } = this.props.userData;
-    if (accessToken) this.fetchTopTracks();
+    if (accessToken) this.fetchTopTracks(accessToken);
   }
 
   handleSelect = e => {
-    this.setState({ optionValue: e.target.value }, () => this.fetchTopTracks());
+    const { accessToken } = this.props.userData;
+    this.setState({ optionValue: e.target.value }, () =>
+      this.fetchTopTracks(accessToken)
+    );
   };
 
-  fetchTopTracks = async () => {
-    const { accessToken } = this.props.userData;
+  fetchTopTracks = async accessToken => {
     try {
       const url = 'https://api.spotify.com';
       const { optionValue } = this.state;
@@ -68,7 +70,7 @@ class TopTracks extends Component {
 
   mapTrackCards = () => {
     const { tracks } = this.state;
-    const { accessToken } = this.props;
+    const { accessToken } = this.props.userData;
     if (tracks) {
       return tracks.map(({ id, ...track }, i) => (
         <TrackCard

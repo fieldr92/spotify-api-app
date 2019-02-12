@@ -1,4 +1,11 @@
-import { FETCH_USER, SIGN_OUT } from '../actions/types';
+import {
+  FETCH_USER,
+  SIGN_OUT,
+  CURRENT_SONG,
+  UNAUTHORIZED_ERROR
+} from '../actions/types';
+
+// App component
 
 export const fetchUserData = url => async dispatch => {
   const res = await fetch(`${url}/v1/me`, {
@@ -6,7 +13,18 @@ export const fetchUserData = url => async dispatch => {
       Authorization: 'Bearer ' + localStorage.getItem('access_token')
     }
   });
-  const data = await tryResponseData(res, url);
+  let data;
+  if (res.status === 200) {
+    data = res.json();
+  } else {
+    data = await refreshAccessToken(url);
+    dispatch({
+      type: UNAUTHORIZED_ERROR,
+      payload: {
+        error: 'Unauthorized!'
+      }
+    });
+  }
   const { display_name, id } = data;
   dispatch({
     type: FETCH_USER,
@@ -16,17 +34,6 @@ export const fetchUserData = url => async dispatch => {
       accessToken: localStorage.getItem('access_token')
     }
   });
-  return data;
-};
-
-const tryResponseData = (res, url) => {
-  try {
-    if (res.ok) return res.json();
-    throw new Error('Access token expired...');
-  } catch (err) {
-    console.log(err.message);
-    return refreshAccessToken(url);
-  }
 };
 
 const refreshAccessToken = async url => {
@@ -41,12 +48,7 @@ const refreshAccessToken = async url => {
     })
   });
   const token = await res.json();
-  const data = await setNewAccessToken(token, url);
   console.log('New access token received!');
-  return data;
-};
-
-const setNewAccessToken = (token, url) => {
   localStorage.setItem('access_token', token.access_token);
   return fetchUserData(url);
 };
@@ -55,4 +57,44 @@ export const clearUserData = () => async dispatch => {
   localStorage.removeItem('access_token');
   localStorage.removeItem('refresh_token');
   dispatch({ type: SIGN_OUT });
+};
+
+// PLaylists component
+
+export const fetchPlaylists = (accessToken, url) => async dispatch => {
+  const res = await fetch(`${url}/v1/me/playlists`, {
+    headers: { Authorization: 'Bearer ' + accessToken }
+  });
+  const data = await res.json();
+  dispatch({
+    type: 'PLAYLISTS',
+    payload: data.items.map(item => ({
+      name: item.name,
+      imageUrl:
+        item.images.length > 0 && item.images[0].url
+          ? item.images[0].url
+          : './assets/Spotify_Icon.png'
+    }))
+  });
+};
+
+// Current song component
+
+export const fetchCurrentSong = accessToken => async dispatch => {
+  const res = await fetch(
+    'https://api.spotify.com/v1/me/player/currently-playing',
+    { headers: { Authorization: 'Bearer ' + accessToken } }
+  );
+  const data = await res.json();
+  if (data.error && data.error.status === 401)
+    return dispatch({
+      type: 'CURRENT_SONG_ERROR',
+      payload: data.error.message
+    });
+  dispatch({
+    type: CURRENT_SONG,
+    payload: {
+      song: data
+    }
+  });
 };

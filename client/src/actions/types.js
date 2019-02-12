@@ -1,2 +1,6 @@
 export const FETCH_USER = 'FETCH_USER';
 export const SIGN_OUT = 'SIGN_OUT';
+export const CURRENT_SONG = 'CURRENT_SONG';
+export const CURRENT_SONG_ERROR = 'CURRENT_SONG_ERROR';
+export const UNAUTHORIZED_ERROR = 'UNAUTHORIZED_ERROR';
+export const PLAYLISTS = 'PLAYLISTS';

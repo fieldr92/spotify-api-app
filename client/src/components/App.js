@@ -27,28 +27,6 @@ class App extends Component {
     }
   }
 
-  // refreshAccessToken = async url => {
-  //   console.log('Getting new access token...');
-  //   const res = await fetch('http://localhost:8888/refresh_token', {
-  //     method: 'POST',
-  //     headers: {
-  //       'Content-Type': 'application/json'
-  //     },
-  //     body: JSON.stringify({
-  //       refresh_token: localStorage.getItem('refresh_token')
-  //     })
-  //   });
-  //   const token = await res.json();
-  //   const data = await this.setNewAccessToken(token, url);
-  //   console.log('New access token received!');
-  //   return data;
-  // };
-
-  // setNewAccessToken = (token, url) => {
-  //   localStorage.setItem('access_token', token.access_token);
-  //   return this.fetchUserData(url);
-  // };
-
   conditionalRender = () => {
     const { userData } = this.props;
     if (!userData) return <LoginPage />;

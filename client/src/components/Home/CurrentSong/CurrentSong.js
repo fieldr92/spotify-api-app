@@ -1,42 +1,25 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
+import { fetchCurrentSong } from '../../../actions';
 
 class CurrentSong extends Component {
-  state = {
-    song: null
-  };
-
   componentDidMount() {
     const { accessToken } = this.props;
-    this.fetchCurrentSong(accessToken);
+    this.props.fetchCurrentSong(accessToken);
   }
 
-  fetchCurrentSong = async accessToken => {
-    const res = await fetch(
-      'https://api.spotify.com/v1/me/player/currently-playing',
-      {
-        headers: { Authorization: 'Bearer ' + accessToken }
-      }
+  displaySong() {
+    const { songError, currentSong } = this.props;
+    if (songError) return <div>Loading current song...</div>;
+    const { item } = currentSong;
+    return (
+      <p>
+        {`${item.name} by `}
+        {item.artists.length > 1
+          ? this.multipleArtists(item.artists)
+          : item.artists[0].name}
+      </p>
     );
-    const data = await res.json();
-    this.setState({
-      song: data
-    });
-  };
-
-  conditionalDisplaySong() {
-    const { song } = this.state;
-    if (song) {
-      const { item } = song;
-      return (
-        <p>
-          {`${item.name} by `}
-          {item.artists.length > 1
-            ? this.multipleArtists(item.artists)
-            : item.artists[0].name}
-        </p>
-      );
-    }
-    return <div>Loading current song...</div>;
   }
 
   multipleArtists(artists) {
@@ -47,15 +30,26 @@ class CurrentSong extends Component {
   }
 
   render() {
+    const { songError, currentSong } = this.props;
+    if (songError || !currentSong) return <div>Loading.....</div>;
     return (
       <>
         <div style={{ textAlign: 'center' }}>
           <h2>Song currently playing:</h2>
-          {this.conditionalDisplaySong()}
+          {this.displaySong()}
         </div>
       </>
     );
   }
 }
 
-export default CurrentSong;
+const mapStateToProps = state => ({
+  accessToken: state.auth.userData.accessToken,
+  currentSong: state.music.song,
+  songError: state.music.error
+});
+
+export default connect(
+  mapStateToProps,
+  { fetchCurrentSong }
+)(CurrentSong);

@@ -17,15 +17,19 @@ class TrackCard extends Component {
 
   playNewSong = async (accessToken, active, uri, i) => {
     const url = 'https://api.spotify.com';
-    const { setActiveSongState } = this.props;
+    const { setActiveSongState, tracks } = this.props;
     try {
       const res = await fetch(`${url}/v1/me/player/play`, {
         method: 'PUT',
         headers: { Authorization: 'Bearer ' + accessToken },
         body: JSON.stringify({ uris: [uri] })
       });
-      if (res.ok)
-        return this.setState({ playing: true }, setActiveSongState(!active, i));
+      if (res.ok) {
+        return this.setState(
+          { playing: true },
+          setActiveSongState(tracks, !active, i)
+        );
+      }
       throw new Error('New song playback failed...');
     } catch (err) {
       return console.log(err.message);
@@ -48,14 +52,17 @@ class TrackCard extends Component {
 
   pauseSong = async (accessToken, active, i) => {
     const url = 'https://api.spotify.com';
-    const { setActiveSongState } = this.props;
+    const { setActiveSongState, tracks } = this.props;
     try {
       const res = await fetch(`${url}/v1/me/player/pause`, {
         method: 'PUT',
         headers: { Authorization: 'Bearer ' + accessToken }
       });
       if (res.ok)
-        return this.setState({ playing: false }, setActiveSongState(active, i));
+        return this.setState(
+          { playing: false },
+          setActiveSongState(tracks, active, i)
+        );
       throw new Error('Pausing failed...');
     } catch (err) {
       console.log(err.message);
@@ -64,7 +71,6 @@ class TrackCard extends Component {
 
   render() {
     const { artists, name, album, albumArt } = this.props.track;
-
     return (
       <tr className="track-row">
         <td className="album-art">

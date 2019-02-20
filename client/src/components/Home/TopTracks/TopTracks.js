@@ -1,82 +1,38 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
+import { fetchTopTracks, setActiveSongState } from '../../../actions';
 import TrackCard from './TrackCard/TrackCard';
-import history from '../../../history';
 import './TopTracks.css';
 
 class TopTracks extends Component {
   state = {
-    tracks: null,
-    optionValue: 'short_term'
+    timeRange: 'short_term'
   };
 
   componentDidMount() {
-    const { accessToken } = this.props.userData;
-    if (accessToken) this.fetchTopTracks(accessToken);
+    const { accessToken, fetchTopTracks } = this.props;
+    const { timeRange } = this.state;
+    if (accessToken) fetchTopTracks(accessToken, timeRange);
   }
 
-  handleSelect = e => {
-    const { accessToken } = this.props.userData;
-    this.setState({ optionValue: e.target.value }, () =>
-      this.fetchTopTracks(accessToken)
-    );
-  };
+  componentDidUpdate(prevProps, prevState) {
+    const { accessToken, fetchTopTracks } = this.props;
+    const { timeRange } = this.state;
+    if (prevState.timeRange !== this.state.timeRange)
+      fetchTopTracks(accessToken, timeRange);
+  }
 
-  fetchTopTracks = async accessToken => {
-    try {
-      const url = 'https://api.spotify.com';
-      const { optionValue } = this.state;
-      const res = await fetch(
-        `${url}/v1/me/top/tracks?limit=20&time_range=${optionValue}`,
-        { headers: { Authorization: `Bearer ${accessToken}` } }
-      );
-      const data = await res.json();
-      this.setState({
-        tracks: data.items.map(({ artists, name, album, id, uri }) => ({
-          artists: artists.map(artist => artist.name),
-          name,
-          id,
-          album: album.name,
-          albumArt: album.images[1].url,
-          uri,
-          playing: false,
-          active: false
-        }))
-      });
-    } catch (err) {
-      console.log(err);
-      history.push('/');
-    }
-  };
-
-  setActiveSongState = (active, i) => {
-    const { tracks } = this.state;
-    this.setState({
-      tracks: tracks.map((track, index) => {
-        const copyTrack = { ...track };
-        if (index === i) {
-          if (active) {
-            copyTrack.active = true;
-            return copyTrack;
-          }
-          copyTrack.active = false;
-          return copyTrack;
-        }
-        copyTrack.active = false;
-        return copyTrack;
-      })
-    });
-  };
+  setValue = (key, value) => this.setState({ [key]: value });
 
   mapTrackCards = () => {
-    const { tracks } = this.state;
-    const { accessToken } = this.props.userData;
+    const { accessToken, tracks, setActiveSongState } = this.props;
     if (tracks) {
       return tracks.map(({ id, ...track }, i) => (
         <TrackCard
           accessToken={accessToken}
+          tracks={tracks}
           track={track}
-          setActiveSongState={this.setActiveSongState}
+          setActiveSongState={setActiveSongState}
           i={i}
           key={id}
         />
@@ -85,12 +41,14 @@ class TopTracks extends Component {
   };
 
   render() {
-    if (!this.state.tracks) return <div>Loading...</div>;
+    if (!this.props.tracks) return <div>Loading...</div>;
     return (
       <div className="track-container">
         <div className="top-selector">
           <h3 style={{ textAlign: 'center' }}>Your top tracks</h3>
-          <select value={this.state.value} onChange={this.handleSelect}>
+          <select
+            name="timeRange"
+            onChange={e => this.setValue(e.target.name, e.target.value)}>
             <option value="short_term">Past 4 weeks</option>
             <option value="medium_term">Past 6 months</option>
             <option value="long_term">Past year</option>
@@ -114,8 +72,12 @@ class TopTracks extends Component {
 
 const mapStateToProps = state => {
   return {
-    userData: state.auth.userData
+    accessToken: state.auth.userData.accessToken,
+    tracks: state.music.tracks
   };
 };
 
-export default connect(mapStateToProps)(TopTracks);
+export default connect(
+  mapStateToProps,
+  { fetchTopTracks, setActiveSongState }
+)(TopTracks);

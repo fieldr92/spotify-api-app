@@ -7,8 +7,8 @@ import './Playlists.css';
 class Playlists extends Component {
   componentDidMount() {
     const url = 'https://api.spotify.com';
-    const { accessToken } = this.props.userData;
-    if (accessToken) this.props.fetchPlaylists(accessToken, url);
+    const { accessToken, isSignedIn } = this.props;
+    if (isSignedIn) this.props.fetchPlaylists(accessToken, url);
   }
 
   mapPlaylists = () => {
@@ -46,8 +46,9 @@ class Playlists extends Component {
 
 const mapStateToProps = state => {
   return {
-    userData: state.auth.userData,
-    playlists: state.music.playlists
+    accessToken: state.auth.userData.accessToken,
+    playlists: state.music.playlists,
+    isSignedIn: state.auth.isSignedIn
   };
 };
 

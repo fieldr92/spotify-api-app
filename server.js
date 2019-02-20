@@ -81,10 +81,10 @@ app.post('/refresh_token', (req, res) => {
     json: true
   };
   request.post(authOptions, (err, response, body) => {
-    if (err) {
-      console.log(err);
+    if (response.statusCode === 400) {
+      res.status(400).json(response);
     }
-    if (!err && response.statusCode === 200) {
+    if (response.statusCode === 200) {
       const { access_token } = body;
       res.send(JSON.stringify({ access_token }));
     }

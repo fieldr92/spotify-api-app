@@ -28,8 +28,8 @@ class App extends Component {
   }
 
   conditionalRender = () => {
-    const { userData } = this.props;
-    if (!userData) return <LoginPage />;
+    const { isSignedIn } = this.props;
+    if (!isSignedIn) return <LoginPage />;
     return <Home />;
   };
 
@@ -44,10 +44,8 @@ class App extends Component {
 }
 
 const mapStateToProps = state => {
-  const { userData } = state.auth;
-  return {
-    userData
-  };
+  const { isSignedIn } = state.auth;
+  return { isSignedIn };
 };
 
 export default connect(

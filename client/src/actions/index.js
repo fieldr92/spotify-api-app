@@ -141,12 +141,12 @@ export const fetchTopTracks = (accessToken, timeRange) => async dispatch => {
   }
 };
 
-export const setActiveSongState = (tracks, active, i) => dispatch => {
+export const setActiveSongState = (tracks, active, trackIndex) => dispatch => {
   dispatch({
     type: SET_ACTIVE_SONG,
-    payload: tracks.map((track, index) => {
+    payload: tracks.map((track, i) => {
       const copyTrack = { ...track };
-      if (index === i) {
+      if (i === trackIndex) {
         if (active) {
           copyTrack.active = true;
           return copyTrack;

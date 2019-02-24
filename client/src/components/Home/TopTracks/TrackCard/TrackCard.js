@@ -3,21 +3,28 @@ import './TrackCard.css';
 
 class TrackCard extends Component {
   state = {
-    playing: false
+    playing: false,
+    trackIndex: null
   };
+
+  componentDidUpdate(prevProps, prevState) {
+    const { playing, trackIndex } = this.state;
+    const { setActiveSongState, tracks } = this.props;
+    if (prevState.playing !== playing && playing === true) setActiveSongState(tracks, true, trackIndex);
+    if (prevState.playing !== playing && playing === false) setActiveSongState(tracks, true, trackIndex);
+  }
 
   handlePlayPause = () => {
     const { accessToken, i } = this.props;
     const { uri, active } = this.props.track;
     const { playing } = this.state;
-    if (!active) return this.playNewSong(accessToken, active, uri, i);
-    if (active && !playing) return this.resumeSong(accessToken, active, i);
-    return this.pauseSong(accessToken, active, i);
+    if (!active) return this.playNewSong(accessToken, uri, i);
+    if (active && !playing) return this.resumeSong(accessToken);
+    return this.pauseSong(accessToken, i);
   };
 
-  playNewSong = async (accessToken, active, uri, i) => {
+  playNewSong = async (accessToken, uri, trackIndex) => {
     const url = 'https://api.spotify.com';
-    const { setActiveSongState, tracks } = this.props;
     try {
       const res = await fetch(`${url}/v1/me/player/play`, {
         method: 'PUT',
@@ -25,10 +32,7 @@ class TrackCard extends Component {
         body: JSON.stringify({ uris: [uri] })
       });
       if (res.ok) {
-        return this.setState(
-          { playing: true },
-          setActiveSongState(tracks, !active, i)
-        );
+        return this.setState({ playing: true, trackIndex });
       }
       throw new Error('New song playback failed...');
     } catch (err) {
@@ -50,19 +54,15 @@ class TrackCard extends Component {
     }
   };
 
-  pauseSong = async (accessToken, active, i) => {
+  pauseSong = async (accessToken, trackIndex) => {
     const url = 'https://api.spotify.com';
-    const { setActiveSongState, tracks } = this.props;
     try {
       const res = await fetch(`${url}/v1/me/player/pause`, {
         method: 'PUT',
         headers: { Authorization: 'Bearer ' + accessToken }
       });
       if (res.ok)
-        return this.setState(
-          { playing: false },
-          setActiveSongState(tracks, active, i)
-        );
+        return this.setState({ playing: false, trackIndex });
       throw new Error('Pausing failed...');
     } catch (err) {
       console.log(err.message);

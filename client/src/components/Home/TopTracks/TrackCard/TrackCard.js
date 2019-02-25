@@ -10,8 +10,10 @@ class TrackCard extends Component {
   componentDidUpdate(prevProps, prevState) {
     const { playing, trackIndex } = this.state;
     const { setActiveSongState, tracks } = this.props;
-    if (prevState.playing !== playing && playing === true) setActiveSongState(tracks, true, trackIndex);
-    if (prevState.playing !== playing && playing === false) setActiveSongState(tracks, true, trackIndex);
+    if (prevState.playing !== playing && playing === true)
+      setActiveSongState(tracks, true, trackIndex);
+    if (prevState.playing !== playing && playing === false)
+      setActiveSongState(tracks, true, trackIndex);
   }
 
   handlePlayPause = () => {
@@ -31,12 +33,10 @@ class TrackCard extends Component {
         headers: { Authorization: 'Bearer ' + accessToken },
         body: JSON.stringify({ uris: [uri] })
       });
-      if (res.ok) {
-        return this.setState({ playing: true, trackIndex });
-      }
+      if (res.ok) return this.setState({ playing: true, trackIndex });
       throw new Error('New song playback failed...');
     } catch (err) {
-      return console.log(err.message);
+      console.log(err.message);
     }
   };
 
@@ -50,7 +50,7 @@ class TrackCard extends Component {
       if (res.ok) return this.setState({ playing: true });
       throw new Error('Resume playback failed...');
     } catch (err) {
-      return console.log(err.message);
+      console.log(err.message);
     }
   };
 
@@ -61,8 +61,7 @@ class TrackCard extends Component {
         method: 'PUT',
         headers: { Authorization: 'Bearer ' + accessToken }
       });
-      if (res.ok)
-        return this.setState({ playing: false, trackIndex });
+      if (res.ok) return this.setState({ playing: false, trackIndex });
       throw new Error('Pausing failed...');
     } catch (err) {
       console.log(err.message);

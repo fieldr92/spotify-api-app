@@ -11,3 +11,4 @@ React app using OAuth to gain access to Spotify API
   - `export SPOTIFY_CLIENT_ID={insert_client_id}`
   - `export SPOTIFY_CLIENT_SECRET={insert_client_secret}`
 - Run `npm run dev` or `yarn dev` to start the app
+- App will be running on http://localhost:3000 (may take a minute for the react side of the app to start)

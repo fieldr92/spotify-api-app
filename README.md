@@ -9,5 +9,5 @@ React app using OAuth to gain access to Spotify API
 - Go to "Edit settings" in the created app on developer.spotify.com and use the redirect URI `http://localhost:8888/callback` - PRESS SAVE!
 - In the app's root folder run the following commands:-
   - `export SPOTIFY_CLIENT_ID={insert_client_id}`
-  - `export SPOTIFY_CLIENT_SECRET`={insert_client_secret}`
+  - `export SPOTIFY_CLIENT_SECRET={insert_client_secret}`
 - Run `npm run dev` or `yarn dev` to start the app
